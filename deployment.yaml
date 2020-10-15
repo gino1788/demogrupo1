@@ -1,0 +1,48 @@
+﻿apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: employees
+  namespace: demogrupo1-aks-ingress
+spec:
+  selector:
+    matchLabels:
+      app: employees
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: employees
+    spec:
+      containers:
+      - name: employees
+        image: demogrupo1cr.azurecr.io/employees:v1
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1Gi"
+          requests:
+            memory: "256Mi"
+            cpu: "500Mi"
+        ports:
+        - containerPort: 80
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: employees
+    namespace: demogrupo1-aks-ingress
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 5000
+      targetPort: 443
+  selector:
+    app: employees
+  type: ClusterIP
+
